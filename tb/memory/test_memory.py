@@ -25,7 +25,7 @@ async def reset(dut):
 
 
 @cocotb.test()
-async def test_memory(dut):
+async def test_basic_writes(dut):
     cocotb.start_soon(Clock(dut.clk, 1, unit="ns").start())
     await reset(dut)
 
@@ -44,6 +44,16 @@ async def test_memory(dut):
             dut.read_data.value == data
         ), f"[MEM] Error at address {addr}: expected {hex(data)}, got {hex(dut.read_data.value)}"
 
+    cocotb.log.info("[MEM] Basic write/read test passed!")
+
+
+@cocotb.test()
+async def test_sequential_writes(dut):
+    cocotb.start_soon(Clock(dut.clk, 1, unit="ns").start())
+    await reset(dut)
+
+    dut.byte_en.value = 0b1111
+
     for i in range(0, 40, 4):
         dut.address.value = i
         dut.write_data.value = i
@@ -59,7 +69,16 @@ async def test_memory(dut):
             read_val == i
         ), f"[MEM] Error at address {i}: expected {i}, got {hex(read_val)}"
 
+    cocotb.log.info("[MEM] Sequential write/read test passed!")
+
+
+@cocotb.test()
+async def test_random_memory(dut):
+    cocotb.start_soon(Clock(dut.clk, 1, unit="ns").start())
+    await reset(dut)
+
     ref_mem = generate_random_mem_file(MEM_FILE, MEM_WORDS)
+    dut.byte_en.value = 0b1111
 
     for addr, data in enumerate(ref_mem):
         dut.address.value = addr * 4
@@ -75,5 +94,3 @@ async def test_memory(dut):
         assert (
             read_val == expected
         ), f"[MEM] Memory mismatch at {addr*4}: expected {hex(expected)}, got {hex(read_val)}"
-
-    cocotb.log.info("[MEM] Random memory contents verified successfully!")
