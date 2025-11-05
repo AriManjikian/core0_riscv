@@ -16,7 +16,7 @@ module regfile #(
     input logic [4:0] address3
 );
 
-  reg [31:0] registers[REGISTER_COUNT];
+  (* public *) reg [31:0] registers[REGISTER_COUNT];
 
   always @(posedge clk) begin
     if (rst_n == 1'b0) begin
