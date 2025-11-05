@@ -1,4 +1,5 @@
 .venv
+.nvim
 *.vcd
 results.xml
 __pycache__

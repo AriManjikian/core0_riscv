@@ -1,5 +1,0 @@
--v /home/ari/coding/core0_riscv/packages/core0_pkg.sv
-+incdir+/home/ari/coding/core0_riscv/packages
-+incdir+/home/ari/coding/core0_riscv/src
-+incdir+/home/ari/coding/core0_riscv/packages
-+incdir+/home/ari/coding/core0_riscv/src
