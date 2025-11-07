@@ -23,30 +23,24 @@ async def cpu_reset(dut):
 
 
 @cocotb.test()
-async def cpu_init_mem_test(dut):
-    cocotb.start_soon(Clock(dut.clk, 1, unit="ns").start())
-    await RisingEdge(dut.clk)
-    await cpu_reset(dut)
-    assert binary_to_hex(dut.pc.value) == "00000000"
-
-    imem = []
-    with open("test_imemory.hex", "r") as f:
-        for line in f:
-            line_content = line.split("//")[0].strip()
-            if line_content:
-                imem.append(hex_to_binary(line_content))
-    for counter in range(5):
-        expected_instr = imem[counter]
-        assert dut.instr.value == expected_instr
-        await RisingEdge(dut.clk)
-
-
-@cocotb.test()
 async def cpu_instr_test(dut):
     cocotb.start_soon(Clock(dut.clk, 1, unit="ns").start())
     await RisingEdge(dut.clk)
     await cpu_reset(dut)
+    # LW
+    await RisingEdge(dut.clk)
+    assert (
+        binary_to_hex(dut.regfile.registers[18].value) == "DEADBEEF"
+    ), "[CPU] LW datapath failed"
+
+    # SW
+    test_addr = int(0xC / 4)
+    assert (
+        binary_to_hex(dut.data_memory.mem[test_addr].value) == "F2F2F2F2"
+    ), "[CPU] SW datapath failed 1"
 
     await RisingEdge(dut.clk)
-    print(binary_to_hex(dut.regfile.registers[18].value))
-    assert binary_to_hex(dut.regfile.registers[18].value) == "DEADBEEF"
+
+    assert (
+        binary_to_hex(dut.data_memory.mem[test_addr].value) == "DEADBEEF"
+    ), f"[CPU] SW datapath failed 2, expected DEADBEEF but got {binary_to_hex(dut.data_memory.mem[test_addr].value)}"

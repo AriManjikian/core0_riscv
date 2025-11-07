@@ -1,8 +1,9 @@
-.PHONY: all test clean alu controller cpu memory regfile signext load_store_decoder reader
+.PHONY: all test clean alu controller cpu memory regfile sign_ext load_store_decoder reader
 
 all: clean test
 
-test: alu controller cpu memory regfile signext load_store_decoder reader
+test:
+	. .venv/bin/activate && $(MAKE) alu controller memory regfile sign_ext load_store_decoder reader cpu
 
 alu:
 	$(MAKE) -C tb/alu
@@ -17,7 +18,7 @@ controller:
 	$(MAKE) -C tb/controller
 
 sign_ext:
-	$(MAKE) -C tb/signext
+	$(MAKE) -C tb/sign_ext
 
 cpu:
 	$(MAKE) -C tb/cpu

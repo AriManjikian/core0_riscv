@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module cpu (
     input logic clk,
     input logic rst_n
@@ -27,7 +29,6 @@ module cpu (
       .address(pc),
       .write_data(32'b0),
       .w_en(1'b0),
-      .byte_en(4'b0),
       .rst_n(1'b1),
 
       .read_data(instr)
@@ -113,9 +114,8 @@ module cpu (
   ) data_memory (
       .clk(clk),
       .address(alu_res),
-      .write_data(32'b0),
-      .w_en(1'b0),
-      .byte_en(4'b0),
+      .write_data(data_reg2),
+      .w_en(mem_write),
       .rst_n(1'b1),
 
       .read_data(mem_read)

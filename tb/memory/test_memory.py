@@ -30,7 +30,7 @@ async def test_basic_writes(dut):
     await reset(dut)
 
     test_data = [(0, 0xDEADBEEF), (4, 0xCAFEBABE), (8, 0x12345678), (12, 0xA5A5A5A5)]
-    dut.byte_en.value = 0b1111
+    # dut.byte_en.value = 0b1111
 
     for addr, data in test_data:
         dut.address.value = addr
@@ -52,7 +52,7 @@ async def test_sequential_writes(dut):
     cocotb.start_soon(Clock(dut.clk, 1, unit="ns").start())
     await reset(dut)
 
-    dut.byte_en.value = 0b1111
+    # dut.byte_en.value = 0b1111
 
     for i in range(0, 40, 4):
         dut.address.value = i
@@ -78,7 +78,7 @@ async def test_random_memory(dut):
     await reset(dut)
 
     ref_mem = generate_random_mem_file(MEM_FILE, MEM_WORDS)
-    dut.byte_en.value = 0b1111
+    # dut.byte_en.value = 0b1111
 
     for addr, data in enumerate(ref_mem):
         dut.address.value = addr * 4
