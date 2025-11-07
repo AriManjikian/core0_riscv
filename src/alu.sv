@@ -10,6 +10,8 @@ module alu (
   always_comb begin
     case (alu_ctrl)
       3'b000:  alu_res = src1 + src2;
+      3'b010:  alu_res = src1 & src2;
+      3'b011:  alu_res = src1 | src2;
       default: alu_res = 32'b0;
     endcase
   end

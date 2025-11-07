@@ -44,3 +44,30 @@ async def cpu_instr_test(dut):
     assert (
         binary_to_hex(dut.data_memory.mem[test_addr].value) == "DEADBEEF"
     ), f"[CPU] SW datapath failed 2, expected DEADBEEF but got {binary_to_hex(dut.data_memory.mem[test_addr].value)}"
+
+    # ADD
+    expected = (0xDEADBEEF + 0x00000AAA) & 0xFFFFFFFF
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[19].value) == "00000AAA"
+    await RisingEdge(dut.clk)
+    assert (
+        binary_to_hex(dut.regfile.registers[20].value) == hex(expected)[2:].upper()
+    ), f"[CPU] Unexpected result during ADD, expected {expected}, but got {binary_to_hex(dut.regfile.registers[20].value)}"
+
+    # AND
+    expected = expected & 0xDEADBEEF
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[21].value) == "DEAD8889"
+    assert (
+        binary_to_hex(dut.regfile.registers[21].value) == hex(expected)[2:].upper()
+    ), f"[CPU] Unexpected result during AND, expected {expected}, but got {binary_to_hex(dut.regfile.registers[21].value)}"
+
+    # OR
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[5].value) == "125F552D"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[6].value) == "7F4FD46A"
+    await RisingEdge(dut.clk)
+    assert (
+        binary_to_hex(dut.regfile.registers[7].value) == "7F5FD56F"
+    ), f"[CPU] Unexpected result during OR, expected 7F5FD56F, but got {binary_to_hex(dut.regfile.registers[7].value)}"

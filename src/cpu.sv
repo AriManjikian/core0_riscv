@@ -44,6 +44,8 @@ module cpu (
   wire [1:0] imm_src;
   wire mem_write;
   wire reg_write;
+  wire alu_src;
+  wire write_back_src;
 
   controller controller_unit (
       .op(op),
@@ -51,10 +53,12 @@ module cpu (
       .func7(7'b0),
       .alu_zero(alu_zero),
 
-      .alu_ctrl (alu_ctrl),
-      .imm_src  (imm_src),
+      .alu_ctrl(alu_ctrl),
+      .imm_src(imm_src),
       .mem_write(mem_write),
-      .reg_write(reg_write)
+      .reg_write(reg_write),
+      .alu_src(alu_src),
+      .write_back_src(write_back_src)
   );
 
   logic [4:0] source_reg1;
@@ -68,7 +72,10 @@ module cpu (
 
   logic [31:0] write_back_data;
   always_comb begin : wbSelect
-    write_back_data = mem_read;
+    case (write_back_src)
+      1'b1: write_back_data = mem_read;
+      default: write_back_data = alu_res;
+    endcase
   end
 
   regfile regfile (
@@ -77,8 +84,10 @@ module cpu (
 
       .address1(source_reg1),
       .address2(source_reg2),
+
       .read_data1(data_reg1),
       .read_data2(data_reg2),
+
       .w_en(reg_write),
       .write_data(write_back_data),
       .address3(dest_reg)
@@ -96,7 +105,10 @@ module cpu (
   wire  [31:0] alu_res;
   logic [31:0] alu_src2;
   always_comb begin : srcBSelect
-    alu_src2 = imm;
+    case (alu_src)
+      1'b1: alu_src2 = imm;
+      default: alu_src2 = data_reg2;
+    endcase
   end
 
   alu alu_inst (

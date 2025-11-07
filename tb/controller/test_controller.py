@@ -1,7 +1,6 @@
 import cocotb
 from cocotb.triggers import Timer
 from cocotb.types import LogicArray
-import random
 
 
 async def set_unknown(dut):
@@ -16,7 +15,7 @@ async def set_unknown(dut):
 
 @cocotb.test()
 async def lw_datapath_test(dut):
-    await set_unknown(dut)
+    set_unknown(dut)
     await Timer(10, unit="ns")
     dut.op.value = 0b0000011
     await Timer(1, unit="ns")
@@ -25,10 +24,13 @@ async def lw_datapath_test(dut):
     assert dut.mem_write.value == "0"
     assert dut.reg_write.value == "1"
 
+    assert dut.alu_src.value == "1"
+    assert dut.write_back_src.value == "1"
+
 
 @cocotb.test()
 async def sw_datapath_test(dut):
-    await set_unknown(dut)
+    set_unknown(dut)
     await Timer(10, unit="ns")
     dut.op.value = 0b0100011
     await Timer(1, unit="ns")
@@ -36,3 +38,34 @@ async def sw_datapath_test(dut):
     assert dut.imm_src.value == "01"
     assert dut.mem_write.value == "1"
     assert dut.reg_write.value == "0"
+
+    assert dut.alu_src.value == "1"
+
+
+@cocotb.test()
+async def add_test(dut):
+    set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b0110011
+    dut.func3.value = 0b000
+    await Timer(1, unit="ns")
+    assert dut.alu_ctrl.value == "000"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "1"
+    assert dut.alu_src.value == "0"
+    assert dut.write_back_src.value == "0"
+
+
+@cocotb.test()
+async def and_test(dut):
+    set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b0110011
+    dut.func3.value = 0b111
+    await Timer(1, unit="ns")
+    assert dut.alu_ctrl.value == "010"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "1"
+
+    assert dut.alu_src.value == "0"
+    assert dut.write_back_src.value == "0"
