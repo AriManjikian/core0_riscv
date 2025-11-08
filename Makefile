@@ -23,6 +23,13 @@ sign_ext:
 cpu:
 	$(MAKE) -C tb/cpu
 
+view: 
+	gtkwave tb/alu/dump.vcd &
+	gtkwave tb/memory/dump.vcd &
+	gtkwave tb/regfile/dump.vcd &
+	gtkwave tb/sign_ext/dump.vcd &
+	gtkwave tb/controller/dump.vcd &
+	gtkwave tb/cpu/dump.vcd &
 
 clean:
 	@find ./tb -type d -name "__pycache__" -exec rm -rf {} +

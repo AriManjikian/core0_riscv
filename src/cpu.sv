@@ -9,7 +9,10 @@ module cpu (
   logic [31:0] pc_next;
 
   always_comb begin : pcSelect
-    pc_next = pc + 4;
+    case (pc_src)
+      1'b1: pc_next = pc + imm;
+      default: pc_next = pc + 4;
+    endcase
   end
 
   always @(posedge clk) begin
@@ -46,6 +49,7 @@ module cpu (
   wire reg_write;
   wire alu_src;
   wire write_back_src;
+  wire pc_src;
 
   controller controller_unit (
       .op(op),
@@ -58,7 +62,8 @@ module cpu (
       .mem_write(mem_write),
       .reg_write(reg_write),
       .alu_src(alu_src),
-      .write_back_src(write_back_src)
+      .write_back_src(write_back_src),
+      .pc_src(pc_src)
   );
 
   logic [4:0] source_reg1;

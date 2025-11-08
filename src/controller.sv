@@ -9,10 +9,14 @@ module controller (
     output logic mem_write,
     output logic reg_write,
     output logic alu_src,
-    output logic write_back_src
+    output logic write_back_src,
+    output logic pc_src
 );
   // OP DECODER
   logic [1:0] alu_op;
+  logic branch;
+
+  /* verilator lint_off LATCH */
   always_comb begin
     case (op)
       // I-Type
@@ -23,6 +27,7 @@ module controller (
         alu_op = 2'b00;
         alu_src = 1'b1;
         write_back_src = 1'b1;
+        branch = 1'b0;
       end
       // S-Type
       7'b0100011: begin
@@ -31,6 +36,7 @@ module controller (
         mem_write = 1'b1;
         alu_op = 2'b00;
         alu_src = 1'b1;
+        branch = 1'b0;
       end
       // R-Type
       7'b0110011: begin
@@ -39,6 +45,15 @@ module controller (
         alu_op = 2'b10;
         alu_src = 1'b0;
         write_back_src = 1'b0;
+        branch = 1'b0;
+      end
+      7'b1100011: begin
+        reg_write = 1'b0;
+        imm_src = 2'b10;
+        alu_src = 1'b0;
+        mem_write = 1'b0;
+        alu_op = 2'b01;
+        branch = 1'b1;
       end
       default: begin
         reg_write = 1'b0;
@@ -48,6 +63,7 @@ module controller (
       end
     endcase
   end
+  /* verilator lint_on LATCH */
 
   //ALU DECODER
   always_comb begin
@@ -71,5 +87,5 @@ module controller (
       default: alu_ctrl = 3'b111;
     endcase
   end
-
+  assign pc_src = branch & alu_zero;
 endmodule

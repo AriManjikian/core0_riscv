@@ -71,3 +71,18 @@ async def cpu_instr_test(dut):
     assert (
         binary_to_hex(dut.regfile.registers[7].value) == "7F5FD56F"
     ), f"[CPU] Unexpected result during OR, expected 7F5FD56F, but got {binary_to_hex(dut.regfile.registers[7].value)}"
+
+    # BEQ
+    assert binary_to_hex(dut.instr.value) == "00730663"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.instr.value) == "00802B03"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[22].value) == "DEADBEEF"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.instr.value) == "00002B03"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[22].value) == "AEAEAEAE"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.instr.value) == "00000663"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.instr.value) == "00000013"

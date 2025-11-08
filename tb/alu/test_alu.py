@@ -52,6 +52,22 @@ async def or_test(dut):
 
 
 @cocotb.test()
+async def sub_test(dut):
+    await Timer(1, unit="ns")
+    dut.alu_ctrl.value = 0b001
+    for _ in range(1000):
+        src1 = random.randint(0, 0xFFFFFFFF)
+        src2 = random.randint(0, 0xFFFFFFFF)
+        dut.src1.value = src1
+        dut.src2.value = src2
+        golden_sub = (src1 - src2) & 0xFFFFFFFF
+        await Timer(1, unit="ns")
+    assert (
+        int(dut.alu_res.value) == golden_sub
+    ), f"[ALU] SUB error src1: {src1}, src2: {src2}. Expected {golden_sub}, but got {dut.alu_res.value}"
+
+
+@cocotb.test()
 async def default_test(dut):
     await Timer(1, unit="ns")
     dut.alu_ctrl.value = 0b111
