@@ -7,16 +7,22 @@ module cpu (
 
   reg   [31:0] pc;
   logic [31:0] pc_next;
-  logic [31:0] pc_target;
+  logic [31:0] pc_plus_second_add;
   logic [31:0] pc_plus_4;
-  assign pc_target = pc + imm;
   assign pc_plus_4 = pc + 4;
 
 
   always_comb begin : pcSelect
-    case (pc_src)
-      1'b1: pc_next = pc_target;
-      default: pc_next = pc_plus_4;
+    unique case (pc_src)
+      1'b0: pc_next = pc_plus_4;
+      1'b1: pc_next = pc_plus_second_add;
+    endcase
+  end
+
+  always_comb begin : sAddSelect
+    unique case (second_add_src)
+      1'b0: pc_plus_second_add = pc + imm;
+      1'b1: pc_plus_second_add = imm;
     endcase
   end
 
@@ -49,12 +55,13 @@ module cpu (
   wire alu_zero;
 
   wire [2:0] alu_ctrl;
-  wire [1:0] imm_src;
+  wire [2:0] imm_src;
   wire mem_write;
   wire reg_write;
   wire alu_src;
   wire [1:0] write_back_src;
   wire pc_src;
+  wire second_add_src;
 
   controller controller_unit (
       .op(op),
@@ -68,7 +75,8 @@ module cpu (
       .reg_write(reg_write),
       .alu_src(alu_src),
       .write_back_src(write_back_src),
-      .pc_src(pc_src)
+      .pc_src(pc_src),
+      .second_add_src(second_add_src)
   );
 
   logic [4:0] source_reg1;
@@ -82,14 +90,15 @@ module cpu (
 
   logic [31:0] write_back_data;
   always_comb begin : wbSelect
-    case (write_back_src)
+    unique case (write_back_src)
       // R-Type
-      2'b00:   write_back_data = alu_res;
+      2'b00: write_back_data = alu_res;
       // I-Type
-      2'b01:   write_back_data = mem_read;
+      2'b01: write_back_data = mem_read;
       // J-Type
-      2'b10:   write_back_data = pc_plus_4;
-      default: write_back_data = alu_res;
+      2'b10: write_back_data = pc_plus_4;
+      // U-Type
+      2'b11: write_back_data = pc_plus_second_add;
     endcase
   end
 

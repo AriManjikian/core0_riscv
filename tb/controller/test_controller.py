@@ -21,7 +21,7 @@ async def lw_datapath_test(dut):
     dut.op.value = 0b0000011
     await Timer(1, unit="ns")
     assert dut.alu_ctrl.value == "000"
-    assert dut.imm_src.value == "00"
+    assert dut.imm_src.value == "000"
     assert dut.mem_write.value == "0"
     assert dut.reg_write.value == "1"
 
@@ -38,7 +38,7 @@ async def sw_datapath_test(dut):
     dut.op.value = 0b0100011
     await Timer(1, unit="ns")
     assert dut.alu_ctrl.value == "000"
-    assert dut.imm_src.value == "01"
+    assert dut.imm_src.value == "001"
     assert dut.mem_write.value == "1"
     assert dut.reg_write.value == "0"
 
@@ -75,7 +75,7 @@ async def addi_test(dut):
     assert dut.alu_ctrl.value == "000"
     assert dut.mem_write.value == "0"
     assert dut.reg_write.value == "1"
-    assert dut.imm_src.value == "00"
+    assert dut.imm_src.value == "000"
     assert dut.alu_src.value == "1"
     assert dut.write_back_src.value == "00"
 
@@ -124,7 +124,7 @@ async def beq_test(dut):
     dut.func3.value = 0b000
     dut.alu_zero.value = 0b0
     await Timer(1, unit="ns")
-    assert dut.imm_src.value == "10"
+    assert dut.imm_src.value == "010"
     assert dut.alu_ctrl.value == "001"
     assert dut.mem_write.value == "0"
     assert dut.reg_write.value == "0"
@@ -144,10 +144,40 @@ async def jal_test(dut):
     await Timer(10, unit="ns")
     dut.op.value = 0b1101111
     await Timer(1, unit="ns")
-    assert dut.imm_src.value == "11"
+    assert dut.imm_src.value == "011"
     assert dut.mem_write.value == "0"
     assert dut.reg_write.value == "1"
     assert dut.branch.value == "0"
     assert dut.pc_src.value == "1"
     assert dut.jump.value == "1"
     assert dut.write_back_src.value == "10"
+
+
+@cocotb.test()
+async def lui_test(dut):
+    await set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b0110111
+    await Timer(1, unit="ns")
+    assert dut.imm_src.value == "100"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "1"
+    assert dut.write_back_src.value == "11"
+    assert dut.branch.value == "0"
+    assert dut.jump.value == "0"
+    assert dut.second_add_src.value == "1"
+
+
+@cocotb.test()
+async def auipc_test(dut):
+    await set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b0010111
+    await Timer(1, unit="ns")
+    assert dut.imm_src.value == "100"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "1"
+    assert dut.write_back_src.value == "11"
+    assert dut.branch.value == "0"
+    assert dut.jump.value == "0"
+    assert dut.second_add_src.value == "0"

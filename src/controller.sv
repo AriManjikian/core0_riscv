@@ -6,25 +6,25 @@ module controller (
     input logic alu_zero,
 
     output logic [2:0] alu_ctrl,
-    output logic [1:0] imm_src,
+    output logic [2:0] imm_src,
     output logic mem_write,
     output logic reg_write,
     output logic alu_src,
     output logic [1:0] write_back_src,
-    output logic pc_src
+    output logic pc_src,
+    output logic second_add_src
 );
   // OP DECODER
   logic [1:0] alu_op;
   logic branch;
   logic jump;
 
-  /* verilator lint_off LATCH */
   always_comb begin
     case (op)
       // I-Type
       7'b0000011: begin
         reg_write = 1'b1;
-        imm_src = 2'b00;
+        imm_src = 3'b000;
         mem_write = 1'b0;
         alu_op = 2'b00;
         alu_src = 1'b1;
@@ -35,7 +35,7 @@ module controller (
       // ALU I-Type
       7'b0010011: begin
         reg_write = 1'b1;
-        imm_src = 2'b00;
+        imm_src = 3'b000;
         mem_write = 1'b0;
         alu_op = 2'b00;
         alu_src = 1'b1;
@@ -46,7 +46,7 @@ module controller (
       // S-Type
       7'b0100011: begin
         reg_write = 1'b0;
-        imm_src = 2'b01;
+        imm_src = 3'b001;
         mem_write = 1'b1;
         alu_op = 2'b00;
         alu_src = 1'b1;
@@ -66,7 +66,7 @@ module controller (
       // B-Type
       7'b1100011: begin
         reg_write = 1'b0;
-        imm_src = 2'b10;
+        imm_src = 3'b010;
         alu_src = 1'b0;
         mem_write = 1'b0;
         alu_op = 2'b01;
@@ -76,15 +76,28 @@ module controller (
       // J-Type
       7'b1101111: begin
         reg_write = 1'b1;
-        imm_src = 2'b11;
+        imm_src = 3'b011;
         mem_write = 1'b0;
         write_back_src = 2'b10;
         branch = 1'b0;
         jump = 1'b1;
       end
+      // U-Type
+      7'b0110111, 7'b0010111: begin
+        reg_write = 1'b1;
+        imm_src = 3'b100;
+        mem_write = 1'b0;
+        write_back_src = 2'b11;
+        branch = 1'b0;
+        jump = 1'b0;
+        unique case (op[5])
+          1'b1: second_add_src = 1'b1;  //lui
+          1'b0: second_add_src = 1'b0;  // auipc
+        endcase
+      end
       default: begin
         reg_write = 1'b0;
-        imm_src = 2'b00;
+        imm_src = 3'b000;
         mem_write = 1'b0;
         alu_op = 2'b00;
         jump = 1'b0;
@@ -94,7 +107,6 @@ module controller (
       end
     endcase
   end
-  /* verilator lint_on LATCH */
 
   //ALU DECODER
   always_comb begin

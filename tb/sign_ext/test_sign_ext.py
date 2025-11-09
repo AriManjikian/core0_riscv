@@ -1,6 +1,5 @@
 import cocotb
-from cocotb.triggers import Timer, RisingEdge
-from cocotb.clock import Clock
+from cocotb.triggers import Timer
 import random
 
 
@@ -8,7 +7,7 @@ import random
 async def sign_ext_i_type_test(dut):
     imm = 0b000001111011
     imm <<= 13
-    src = 0b00
+    src = 0b000
     irrelevant_bits = 0b000000000000_1100101011010
     raw_data = irrelevant_bits | imm
     await Timer(1, unit="ns")
@@ -23,7 +22,7 @@ async def sign_ext_i_type_test(dut):
 
     imm = 0b111110000101
     imm <<= 13
-    src = 0b00
+    src = 0b000
     irrelevant_bits = 0b000000000000_1100101011010
     raw_data = irrelevant_bits | imm
     await Timer(1, unit="ns")
@@ -57,7 +56,7 @@ async def sign_ext_s_type_test(dut):
         imm_11_5 = imm >> 5
         imm_4_0 = imm & 0b000000011111
         raw_data = (imm_11_5 << 18) | (imm_4_0)  # the 25 bits of data
-        source = 0b01
+        source = 0b001
         await Timer(1, unit="ns")
         dut.raw_src.value = raw_data
         dut.imm_src.value = source
@@ -78,7 +77,7 @@ async def sign_ext_b_type_test(dut):
         imm_10_5 = (imm & 0b0011111100000) >> 5
         imm_4_1 = (imm & 0b0000000011110) >> 1
         raw_data = (imm_12 << 24) | (imm_11 << 0) | (imm_10_5 << 18) | (imm_4_1 << 1)
-        source = 0b10
+        source = 0b010
         await Timer(1, unit="ns")
         dut.raw_src.value = raw_data
         dut.imm_src.value = source
@@ -95,7 +94,7 @@ async def sign_ext_b_type_test(dut):
         imm_10_5 = (imm & 0b0011111100000) >> 5
         imm_4_1 = (imm & 0b0000000011110) >> 1
         raw_data = (imm_12 << 24) | (imm_11 << 0) | (imm_10_5 << 18) | (imm_4_1 << 1)
-        source = 0b10
+        source = 0b010
         await Timer(1, unit="ns")
         dut.raw_src.value = raw_data
         dut.imm_src.value = source
@@ -116,7 +115,7 @@ async def sign_ext_j_type_test(dut):
         imm_11 = (imm & 0b000000000100000000000) >> 11
         imm_10_1 = (imm & 0b000000000011111111110) >> 1
         raw_data = (imm_20 << 24) | (imm_19_12 << 5) | (imm_11 << 13) | (imm_10_1 << 14)
-        source = 0b11
+        source = 0b011
         await Timer(1, unit="ns")
         dut.raw_src.value = raw_data
         dut.imm_src.value = source
@@ -133,7 +132,7 @@ async def sign_ext_j_type_test(dut):
         imm_11 = (imm & 0b000000000100000000000) >> 11
         imm_10_1 = (imm & 0b000000000011111111110) >> 1
         raw_data = (imm_20 << 24) | (imm_19_12 << 5) | (imm_11 << 13) | (imm_10_1 << 14)
-        source = 0b11
+        source = 0b011
         await Timer(1, unit="ns")
         dut.raw_src.value = raw_data
         dut.imm_src.value = source
@@ -141,3 +140,21 @@ async def sign_ext_j_type_test(dut):
         assert int(dut.imm.value) - (1 << 32) == imm - (
             1 << 21
         ), f"[SIGN] J-Neg Mismatch, expected {imm} but got {int(dut.imm.value)}"
+
+
+@cocotb.test()
+async def sign_ext_u_type_test(dut):
+    for _ in range(100):
+        await Timer(100, unit="ns")
+        imm_31_12 = random.randint(0, 0b11111111111111111111)
+        raw_data = imm_31_12 << 5
+        irrelevant_bits = random.randint(0, 0b11111)
+        raw_data = raw_data | irrelevant_bits
+        source = 0b100
+        await Timer(1, unit="ns")
+        dut.raw_src.value = raw_data
+        dut.imm_src.value = source
+        await Timer(1, unit="ns")
+        assert (
+            int(dut.imm.value) == imm_31_12 << 12
+        ), f"[SIGN] U Mismatch, expected {imm_31_12 << 12} but got {int(dut.imm.value)}"
