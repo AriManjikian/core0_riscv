@@ -7,11 +7,16 @@ module cpu (
 
   reg   [31:0] pc;
   logic [31:0] pc_next;
+  logic [31:0] pc_target;
+  logic [31:0] pc_plus_4;
+  assign pc_target = pc + imm;
+  assign pc_plus_4 = pc + 4;
+
 
   always_comb begin : pcSelect
     case (pc_src)
-      1'b1: pc_next = pc + imm;
-      default: pc_next = pc + 4;
+      1'b1: pc_next = pc_target;
+      default: pc_next = pc_plus_4;
     endcase
   end
 
@@ -48,7 +53,7 @@ module cpu (
   wire mem_write;
   wire reg_write;
   wire alu_src;
-  wire write_back_src;
+  wire [1:0] write_back_src;
   wire pc_src;
 
   controller controller_unit (
@@ -78,7 +83,12 @@ module cpu (
   logic [31:0] write_back_data;
   always_comb begin : wbSelect
     case (write_back_src)
-      1'b1: write_back_data = mem_read;
+      // R-Type
+      2'b00:   write_back_data = alu_res;
+      // I-Type
+      2'b01:   write_back_data = mem_read;
+      // J-Type
+      2'b10:   write_back_data = pc_plus_4;
       default: write_back_data = alu_res;
     endcase
   end

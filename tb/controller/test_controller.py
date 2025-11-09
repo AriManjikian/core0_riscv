@@ -9,13 +9,14 @@ async def set_unknown(dut):
     dut.func3.value = LogicArray("XXX")
     dut.func7.value = LogicArray("XXXXXXX")
     dut.alu_zero.value = LogicArray("X")
+    dut.write_back_src.value = LogicArray("XX")
 
     await Timer(1, unit="ns")
 
 
 @cocotb.test()
 async def lw_datapath_test(dut):
-    set_unknown(dut)
+    await set_unknown(dut)
     await Timer(10, unit="ns")
     dut.op.value = 0b0000011
     await Timer(1, unit="ns")
@@ -25,14 +26,14 @@ async def lw_datapath_test(dut):
     assert dut.reg_write.value == "1"
 
     assert dut.alu_src.value == "1"
-    assert dut.write_back_src.value == "1"
+    assert dut.write_back_src.value == "01"
 
     assert dut.pc_src.value == "0"
 
 
 @cocotb.test()
 async def sw_datapath_test(dut):
-    set_unknown(dut)
+    await set_unknown(dut)
     await Timer(10, unit="ns")
     dut.op.value = 0b0100011
     await Timer(1, unit="ns")
@@ -50,7 +51,7 @@ async def sw_datapath_test(dut):
 
 @cocotb.test()
 async def add_test(dut):
-    set_unknown(dut)
+    await set_unknown(dut)
     await Timer(10, unit="ns")
     dut.op.value = 0b0110011
     dut.func3.value = 0b000
@@ -59,14 +60,14 @@ async def add_test(dut):
     assert dut.mem_write.value == "0"
     assert dut.reg_write.value == "1"
     assert dut.alu_src.value == "0"
-    assert dut.write_back_src.value == "0"
+    assert dut.write_back_src.value == "00"
 
     assert dut.pc_src.value == "0"
 
 
 @cocotb.test()
 async def and_test(dut):
-    set_unknown(dut)
+    await set_unknown(dut)
     await Timer(10, unit="ns")
     dut.op.value = 0b0110011
     dut.func3.value = 0b111
@@ -76,14 +77,14 @@ async def and_test(dut):
     assert dut.reg_write.value == "1"
 
     assert dut.alu_src.value == "0"
-    assert dut.write_back_src.value == "0"
+    assert dut.write_back_src.value == "00"
 
     assert dut.pc_src.value == "0"
 
 
 @cocotb.test()
 async def or_test(dut):
-    set_unknown(dut)
+    await set_unknown(dut)
     await Timer(10, unit="ns")
     dut.op.value = 0b0110011
     dut.func3.value = 0b110
@@ -93,14 +94,14 @@ async def or_test(dut):
     assert dut.reg_write.value == "1"
 
     assert dut.alu_src.value == "0"
-    assert dut.write_back_src.value == "0"
+    assert dut.write_back_src.value == "00"
 
     assert dut.pc_src.value == "0"
 
 
 @cocotb.test()
 async def beq_test(dut):
-    set_unknown(dut)
+    await set_unknown(dut)
     await Timer(10, unit="ns")
     dut.op.value = 0b1100011
     dut.func3.value = 0b000
@@ -118,3 +119,18 @@ async def beq_test(dut):
     dut.alu_zero.value = 0b1
     await Timer(1, unit="ns")
     assert dut.pc_src.value == "1"
+
+
+@cocotb.test()
+async def jal_test(dut):
+    await set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b1101111
+    await Timer(1, unit="ns")
+    assert dut.imm_src.value == "11"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "1"
+    assert dut.branch.value == "0"
+    assert dut.pc_src.value == "1"
+    assert dut.jump.value == "1"
+    assert dut.write_back_src.value == "10"

@@ -86,3 +86,21 @@ async def cpu_instr_test(dut):
     assert binary_to_hex(dut.instr.value) == "00000663"
     await RisingEdge(dut.clk)
     assert binary_to_hex(dut.instr.value) == "00000013"
+    await RisingEdge(dut.clk)
+
+    # JAL
+    assert binary_to_hex(dut.instr.value) == "00C000EF"
+    assert binary_to_hex(dut.pc.value) == "00000044"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.instr.value) == "FFDFF0EF"
+    assert binary_to_hex(dut.pc.value) == "00000050"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.instr.value) == "00C000EF"
+    assert binary_to_hex(dut.pc.value) == "0000004C"
+    assert binary_to_hex(dut.regfile.registers[1].value) == "00000054"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.instr.value) == "00C02383"
+    assert binary_to_hex(dut.pc.value) == "00000058"
+    assert binary_to_hex(dut.regfile.registers[1].value) == "00000050"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[7].value) == "DEADBEEF"
