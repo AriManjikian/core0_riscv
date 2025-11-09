@@ -104,3 +104,12 @@ async def cpu_instr_test(dut):
     assert binary_to_hex(dut.regfile.registers[1].value) == "00000050"
     await RisingEdge(dut.clk)
     assert binary_to_hex(dut.regfile.registers[7].value) == "DEADBEEF"
+
+    # ADDI
+    assert binary_to_hex(dut.instr.value) == "1AB38D13"
+    assert not binary_to_hex(dut.regfile.registers[26].value) == "DEADC09A"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.instr.value) == "F2130C93"
+    assert binary_to_hex(dut.regfile.registers[26].value) == "DEADC09A"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[25].value) == "7F4FD38B"

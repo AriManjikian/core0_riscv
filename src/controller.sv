@@ -32,6 +32,17 @@ module controller (
         branch = 1'b0;
         jump = 1'b0;
       end
+      // ALU I-Type
+      7'b0010011: begin
+        reg_write = 1'b1;
+        imm_src = 2'b00;
+        mem_write = 1'b0;
+        alu_op = 2'b00;
+        alu_src = 1'b1;
+        write_back_src = 2'b00;
+        branch = 1'b0;
+        jump = 1'b0;
+      end
       // S-Type
       7'b0100011: begin
         reg_write = 1'b0;
