@@ -97,13 +97,9 @@ module controller (
       end
       default: begin
         reg_write = 1'b0;
-        imm_src = 3'b000;
         mem_write = 1'b0;
-        alu_op = 2'b00;
         jump = 1'b0;
         branch = 1'b0;
-        alu_src = 1'b0;
-        write_back_src = 2'b00;
       end
     endcase
   end

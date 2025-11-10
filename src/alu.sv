@@ -6,6 +6,7 @@ module alu (
     output logic [31:0] alu_res,
     output logic zero
 );
+  wire [4:0] shamt = src2[4:0];
 
   always_comb begin
     case (alu_ctrl)
@@ -16,7 +17,7 @@ module alu (
       4'b0101: alu_res = {31'b0, $signed(src1) < $signed(src2)};
       4'b0111: alu_res = {31'b0, src1 < src2};
       4'b1000: alu_res = src1 ^ src2;
-      4'b0100: alu_res = src1 << src2;  // SLL shift left logical
+      4'b0100: alu_res = src1 << shamt;
       default: alu_res = 32'd0;
     endcase
   end
