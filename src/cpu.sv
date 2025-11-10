@@ -20,9 +20,11 @@ module cpu (
   end
 
   always_comb begin : sAddSelect
-    unique case (second_add_src)
-      1'b0: pc_plus_second_add = pc + imm;
-      1'b1: pc_plus_second_add = imm;
+    case (second_add_src)
+      2'b00:   pc_plus_second_add = pc + imm;
+      2'b01:   pc_plus_second_add = imm;
+      2'b10:   pc_plus_second_add = data_reg1 + imm;
+      default: pc_plus_second_add = 32'd0;
     endcase
   end
 
@@ -64,7 +66,7 @@ module cpu (
   wire alu_last_bit;
   wire [1:0] write_back_src;
   wire pc_src;
-  wire second_add_src;
+  wire [1:0] second_add_src;
 
   controller controller_unit (
       .op(op),

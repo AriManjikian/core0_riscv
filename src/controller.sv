@@ -13,7 +13,7 @@ module controller (
     output logic alu_src,
     output logic [1:0] write_back_src,
     output logic pc_src,
-    output logic second_add_src
+    output logic [1:0] second_add_src
 );
   // OP DECODER
   logic [1:0] alu_op;
@@ -79,16 +79,22 @@ module controller (
         alu_op = 2'b01;
         branch = 1'b1;
         jump = 1'b0;
-        second_add_src = 1'b0;
+        second_add_src = 2'b00;
       end
       // J-Type
-      7'b1101111: begin
+      7'b1101111, 7'b1100111: begin
         reg_write = 1'b1;
-        imm_src = 3'b011;
         mem_write = 1'b0;
         write_back_src = 2'b10;
         branch = 1'b0;
         jump = 1'b1;
+        if (op[3]) begin
+          second_add_src = 2'b00;
+          imm_src = 3'b011;
+        end else if (~op[3]) begin
+          second_add_src = 2'b10;
+          imm_src = 3'b000;
+        end
       end
       // U-Type
       7'b0110111, 7'b0010111: begin
@@ -99,8 +105,8 @@ module controller (
         branch = 1'b0;
         jump = 1'b0;
         unique case (op[5])
-          1'b1: second_add_src = 1'b1;  //lui
-          1'b0: second_add_src = 1'b0;  // auipc
+          1'b1: second_add_src = 2'b01;  //lui
+          1'b0: second_add_src = 2'b00;  // auipc
         endcase
       end
       default: begin

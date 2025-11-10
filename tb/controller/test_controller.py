@@ -331,13 +331,13 @@ async def beq_test(dut):
     assert dut.alu_src.value == "0"
     assert dut.branch.value == "1"
     assert dut.pc_src.value == "0"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
     await Timer(3, unit="ns")
     dut.alu_zero.value = 0b1
     await Timer(1, unit="ns")
     assert dut.pc_src.value == "1"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
 
 @cocotb.test()
@@ -355,13 +355,13 @@ async def bne_test(dut):
     assert dut.alu_src.value == "0"
     assert dut.branch.value == "1"
     assert dut.pc_src.value == "0"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
     await Timer(3, unit="ns")
     dut.alu_zero.value = 0b0
     await Timer(1, unit="ns")
     assert dut.pc_src.value == "1"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
 
 @cocotb.test()
@@ -379,13 +379,13 @@ async def blt_test(dut):
     assert dut.alu_src.value == "0"
     assert dut.branch.value == "1"
     assert dut.pc_src.value == "0"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
     await Timer(3, unit="ns")
     dut.alu_last_bit.value = 0b1
     await Timer(1, unit="ns")
     assert dut.pc_src.value == "1"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
 
 @cocotb.test()
@@ -403,13 +403,13 @@ async def bge_test(dut):
     assert dut.alu_src.value == "0"
     assert dut.branch.value == "1"
     assert dut.pc_src.value == "0"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
     await Timer(3, unit="ns")
     dut.alu_last_bit.value = 0b0
     await Timer(1, unit="ns")
     assert dut.pc_src.value == "1"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
 
 @cocotb.test()
@@ -427,13 +427,13 @@ async def bltu_test(dut):
     assert dut.alu_src.value == "0"
     assert dut.branch.value == "1"
     assert dut.pc_src.value == "0"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
     await Timer(3, unit="ns")
     dut.alu_last_bit.value = 0b1
     await Timer(1, unit="ns")
     assert dut.pc_src.value == "1"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
 
 @cocotb.test()
@@ -451,13 +451,13 @@ async def bgeu_test(dut):
     assert dut.alu_src.value == "0"
     assert dut.branch.value == "1"
     assert dut.pc_src.value == "0"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
     await Timer(3, unit="ns")
     dut.alu_last_bit.value = 0b0
     await Timer(1, unit="ns")
     assert dut.pc_src.value == "1"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
 
 
 @cocotb.test()
@@ -473,6 +473,23 @@ async def jal_test(dut):
     assert dut.pc_src.value == "1"
     assert dut.jump.value == "1"
     assert dut.write_back_src.value == "10"
+    assert dut.second_add_src.value == "00"
+
+
+@cocotb.test()
+async def jalr_test(dut):
+    await set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b1100111
+    await Timer(1, unit="ns")
+    assert dut.imm_src.value == "000"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "1"
+    assert dut.branch.value == "0"
+    assert dut.pc_src.value == "1"
+    assert dut.jump.value == "1"
+    assert dut.write_back_src.value == "10"
+    assert dut.second_add_src.value == "10"
 
 
 @cocotb.test()
@@ -487,7 +504,7 @@ async def lui_test(dut):
     assert dut.write_back_src.value == "11"
     assert dut.branch.value == "0"
     assert dut.jump.value == "0"
-    assert dut.second_add_src.value == "1"
+    assert dut.second_add_src.value == "01"
 
 
 @cocotb.test()
@@ -502,4 +519,4 @@ async def auipc_test(dut):
     assert dut.write_back_src.value == "11"
     assert dut.branch.value == "0"
     assert dut.jump.value == "0"
-    assert dut.second_add_src.value == "0"
+    assert dut.second_add_src.value == "00"
