@@ -28,6 +28,8 @@ module alu (
       4'b0100: alu_res = src1 << shamt;
       // SRL
       4'b0110: alu_res = src1 >> shamt;
+      // SRA
+      4'b1001: alu_res = $signed(src1) >>> shamt;
       default: alu_res = 32'd0;
     endcase
   end

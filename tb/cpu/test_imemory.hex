@@ -40,6 +40,7 @@ FFFAF993 // andi x19 x21 0xFFF | x19 <= FFFFFEEF
 02499993 // NO CHANGE ! (wrong "F7" for SL)
 0049DA13 // srli x20 x19 0x4 | x20 <= 0FFFFEEF
 0249DA13 // invalid op test | NO CHANGE ! (wrong "F7" for SR)
+404ADA93 // srai x21 x21 0x4 | x21 <= FFFFFFEE
 00000013
 00000013
 00000013

@@ -3,6 +3,12 @@ from cocotb.triggers import Timer
 import random
 
 
+def binary_to_hex(binnum):
+    hexnum = hex(int(str(binnum), 2))[2:]
+    hexnum = hexnum.zfill(8)
+    return hexnum.upper()
+
+
 @cocotb.test()
 async def add_test(dut):
     await Timer(1, unit="ns")
@@ -143,7 +149,37 @@ async def srl_test(dut):
 
         assert int(dut.alu_res.value) == int(
             golden_srl
-        ), f"[ALU] SLL error src1: {src1}, src2: {src2}, shamt: {shamt}. Expected {golden_srl}, but got {dut.alu_res.value}"
+        ), f"[ALU] SRL error src1: {src1}, src2: {src2}, shamt: {shamt}. Expected {golden_srl}, but got {dut.alu_res.value}"
+
+
+@cocotb.test()
+async def sra_test(dut):
+    await Timer(1, unit="ns")
+    dut.alu_ctrl.value = 0b1001
+    for _ in range(1000):
+        src1 = random.randint(0, 0x7FFFFFFF)
+        src2 = random.randint(0, 0xFFFFFFFF)
+        dut.src1.value = src1
+        shamt = src2 & 0b11111
+        dut.src2.value = shamt
+
+        await Timer(1, unit="ns")
+        golden_sra = (src1 >> shamt) & 0xFFFFFFFF
+
+        assert int(dut.alu_res.value) == int(golden_sra)
+
+        src1 = random.randint(0x80000000, 0xFFFFFFFF)
+        src2 = random.randint(0, 0xFFFFFFFF)
+        dut.src1.value = src1
+        shamt = src2 & 0b11111
+        dut.src2.value = shamt
+
+        await Timer(1, unit="ns")
+        golden_sra = ((src1 - (1 << 32)) >> shamt) & 0xFFFFFFFF
+        assert (
+            binary_to_hex(dut.alu_res.value) == hex(golden_sra)[2:].upper()
+        ), f"[ALU] SRA error src1: {src1}, src2: {src2}, shamt: {shamt}. Expected {golden_sra}, but got {dut.alu_res.value}"
+        assert int(dut.alu_res.value) == golden_sra
 
 
 @cocotb.test()
