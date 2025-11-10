@@ -283,4 +283,15 @@ async def cpu_instr_test(dut):
     assert binary_to_hex(dut.pc.value) == "0000010C"
     assert binary_to_hex(dut.regfile.registers[8].value) == "FFFFFFEE"
 
+    assert binary_to_hex(dut.instr.value) == "00000397"
+    await RisingEdge(dut.clk)
     # JALR
+    assert binary_to_hex(dut.instr.value) == "01438393"
+    assert binary_to_hex(dut.regfile.registers[7].value) == "0000010C"
+    assert binary_to_hex(dut.pc.value) == "00000110"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.instr.value) == "FFC380E7"
+    assert binary_to_hex(dut.pc.value) == "00000114"
+    assert binary_to_hex(dut.regfile.registers[7].value) == "00000120"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[1].value) == "00000118"

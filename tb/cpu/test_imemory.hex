@@ -68,6 +68,7 @@ FFFAF993     // andi x19 x21 0xFFF        | x19 <= FFFFFEEF                     
 00000397     // auipc x7 0x0              | x7 <= 00000110                                          | PC:0x0000010C
 01438393     // addi x7 x7 0x10           | x7 <= 00000120                                          | PC:0x00000110
 FFC380E7     // jalr x1  -4(x7)           | x1 <= 00000118                                          | PC:0x00000114
-00000013     //                           |                                                         | PC:0x00000118
+00C00413     // addi x8 x0 0xC            | NEVER EXECUTED (check value)                            | PC:0x00000118
 00000013     //                           |                                                         | PC:0x0000011C
 00000013     //                           |                                                         | PC:0x00000120
+00000013     //                           |                                                         | PC:0x00000124
