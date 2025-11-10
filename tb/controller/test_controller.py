@@ -1,6 +1,7 @@
 import cocotb
 from cocotb.triggers import Timer
 from cocotb.types import LogicArray
+import random
 
 
 async def set_unknown(dut):
@@ -217,6 +218,53 @@ async def slli_test(dut):
     assert dut.write_back_src.value == "00"
 
     assert dut.pc_src.value == "0"
+
+    # INVALID F7
+    for _ in range(1000):
+        await Timer(1, unit="ns")
+        dut.op.value = 0b0010011
+        dut.func3.value = 0b001
+        dut.func7.value = random.randint(0b0000001, 0b1111111)
+        await Timer(1, unit="ns")
+
+        assert dut.alu_ctrl.value == "0100"
+        assert dut.imm_src.value == "000"
+        assert dut.mem_write.value == "0"
+        assert dut.reg_write.value == "0"
+        assert dut.alu_src.value == "1"
+        assert dut.write_back_src.value == "00"
+        assert dut.pc_src.value == "0"
+
+
+@cocotb.test()
+async def srli_test(dut):
+    await set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b0010011
+    dut.func3.value = 0b101
+    await Timer(1, unit="ns")
+    assert dut.alu_ctrl.value == "0110"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "1"
+    assert dut.alu_src.value == "1"
+    assert dut.write_back_src.value == "00"
+
+    # INVALID F7
+    for _ in range(1000):
+        await Timer(1, unit="ns")
+        dut.op.value = 0b0010011
+        dut.func3.value = 0b101
+        random_func7 = random.randint(0b0000001, 0b1111111)
+        while random_func7 == 0b0100000:
+            random_func7 = random.randint(0b0000001, 0b1111111)
+        dut.func7.value = random_func7
+        await Timer(1, unit="ns")
+
+        assert dut.alu_ctrl.value == "0110"
+        assert dut.mem_write.value == "0"
+        assert dut.reg_write.value == "0"
+        assert dut.alu_src.value == "1"
+        assert dut.write_back_src.value == "00"
 
 
 @cocotb.test()

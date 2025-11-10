@@ -109,6 +109,44 @@ async def sltu_test(dut):
 
 
 @cocotb.test()
+async def sll_test(dut):
+    await Timer(1, unit="ns")
+    dut.alu_ctrl.value = 0b0100
+    for _ in range(1000):
+        src1 = random.randint(0, 0xFFFFFFFF)
+        src2 = random.randint(0, 0xFFFFFFFF)
+        dut.src1.value = src1
+        shamt = src2 & 0b11111
+        dut.src2.value = shamt
+
+        await Timer(1, unit="ns")
+        golden_sll = (src1 << shamt) & 0xFFFFFFFF
+
+        assert int(dut.alu_res.value) == int(
+            golden_sll
+        ), f"[ALU] SLL error src1: {src1}, src2: {src2}, shamt: {shamt}. Expected {golden_sll}, but got {dut.alu_res.value}"
+
+
+@cocotb.test()
+async def srl_test(dut):
+    await Timer(1, unit="ns")
+    dut.alu_ctrl.value = 0b0110
+    for _ in range(1000):
+        src1 = random.randint(0, 0xFFFFFFFF)
+        src2 = random.randint(0, 0xFFFFFFFF)
+        dut.src1.value = src1
+        shamt = src2 & 0b11111
+        dut.src2.value = shamt
+
+        await Timer(1, unit="ns")
+        golden_srl = (src1 >> shamt) & 0xFFFFFFFF
+
+        assert int(dut.alu_res.value) == int(
+            golden_srl
+        ), f"[ALU] SLL error src1: {src1}, src2: {src2}, shamt: {shamt}. Expected {golden_srl}, but got {dut.alu_res.value}"
+
+
+@cocotb.test()
 async def xor_test(dut):
     await Timer(1, unit="ns")
     dut.alu_ctrl.value = 0b1000

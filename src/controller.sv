@@ -34,7 +34,7 @@ module controller (
       end
       // ALU I-Type
       7'b0010011: begin
-        reg_write = 1'b1;
+        // reg_write = 1'b1;
         imm_src = 3'b000;
         mem_write = 1'b0;
         alu_op = 2'b10;
@@ -42,6 +42,13 @@ module controller (
         write_back_src = 2'b00;
         branch = 1'b0;
         jump = 1'b0;
+        if (func3 == 3'b001) begin
+          reg_write = (func7 == 7'b0000000) ? 1'b1 : 1'b0;
+        end else if (func3 == 3'b101) begin
+          reg_write = (func7 == 7'b0000000 | func7 == 7'b0100000) ? 1'b1 : 1'b0;
+        end else begin
+          reg_write = 1'b1;
+        end
       end
       // S-Type
       7'b0100011: begin
@@ -126,6 +133,8 @@ module controller (
           3'b100:  alu_ctrl = 4'b1000;
           // SLL
           3'b001:  alu_ctrl = 4'b0100;
+          // SRL
+          3'b101:  alu_ctrl = 4'b0110;
           default: alu_ctrl = 4'b0111;
         endcase
       end

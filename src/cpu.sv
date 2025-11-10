@@ -52,6 +52,8 @@ module cpu (
   assign op = instr[6:0];
   logic [2:0] func3;
   assign func3 = instr[14:12];
+  logic [6:0] func7;
+  assign func7 = instr[31:25];
   wire alu_zero;
 
   wire [3:0] alu_ctrl;
@@ -66,7 +68,7 @@ module cpu (
   controller controller_unit (
       .op(op),
       .func3(func3),
-      .func7(7'b0),
+      .func7(func7),
       .alu_zero(alu_zero),
 
       .alu_ctrl(alu_ctrl),
