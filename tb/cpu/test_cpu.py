@@ -1,16 +1,15 @@
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import RisingEdge, Timer
+from cocotb.triggers import RisingEdge
 
 
 def binary_to_hex(binnum):
-    hexnum = hex(int(str(binnum), 2))[2:]
-    hexnum = hexnum.zfill(8)
+    hexnum = hex(int(binnum))[2:].zfill(8)
     return hexnum.upper()
 
 
 def hex_to_binary(hexnum):
-    binnum = bin(int(str(hexnum), 16))[2:]
+    binnum = bin(int(hexnum.value), 16)[2:]
     binnum = binnum.zfill(32)
     return binnum.upper()
 
@@ -188,7 +187,47 @@ async def cpu_instr_test(dut):
     # SRAI
     assert binary_to_hex(dut.instr.value) == "404ADA93"
     await RisingEdge(dut.clk)
-    assert binary_to_hex(dut.regfile.registers[21].value) == "0FFFFFEE"
+    assert binary_to_hex(dut.regfile.registers[21].value) == "FFFFFFEE"
     assert dut.reg_write.value == "0"
     await RisingEdge(dut.clk)
-    assert binary_to_hex(dut.regfile.registers[21].value) == "0FFFFFEE"
+    assert binary_to_hex(dut.regfile.registers[21].value) == "FFFFFFEE"
+
+    # SUB
+    assert binary_to_hex(dut.instr.value) == "412A8933"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[18].value) == "FFFFF8FF"
+
+    # ADDI
+    assert binary_to_hex(dut.instr.value) == "00800393"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[7].value) == "00000008"
+
+    # SLL
+    assert binary_to_hex(dut.instr.value) == "00791933"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[18].value) == "FFF8FF00"
+
+    # SLT
+    assert binary_to_hex(dut.instr.value) == "013928B3"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[17].value) == "00000001"
+
+    # SLTU
+    assert binary_to_hex(dut.instr.value) == "013938B3"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[17].value) == "00000001"
+
+    # XOR
+    assert binary_to_hex(dut.instr.value) == "013948B3"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[17].value) == "000711F0"
+
+    # SRL
+    assert binary_to_hex(dut.instr.value) == "0079D433"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[8].value) == "00FFFFEE"
+
+    # SRA
+    assert binary_to_hex(dut.instr.value) == "4079D433"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[8].value) == "FFFFFFEE"

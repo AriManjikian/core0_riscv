@@ -34,7 +34,6 @@ module controller (
       end
       // ALU I-Type
       7'b0010011: begin
-        // reg_write = 1'b1;
         imm_src = 3'b000;
         mem_write = 1'b0;
         alu_op = 2'b10;
@@ -119,22 +118,35 @@ module controller (
       // R-Types
       2'b10: begin
         case (func3)
-          // ADD
-          3'b000:  alu_ctrl = 4'b0000;
+          // ADD, SUB
+          3'b000: begin
+            if (op == 7'b0110011) begin
+              alu_ctrl = func7[5] ? 4'b0001 : 4'b0000;
+            end else begin
+              alu_ctrl = 4'b0000;
+            end
+          end
           // AND
-          3'b111:  alu_ctrl = 4'b0010;
+          3'b111: alu_ctrl = 4'b0010;
           // OR
-          3'b110:  alu_ctrl = 4'b0011;
+          3'b110: alu_ctrl = 4'b0011;
           // SLTI
-          3'b010:  alu_ctrl = 4'b0101;
+          3'b010: alu_ctrl = 4'b0101;
           // SLTIU
-          3'b011:  alu_ctrl = 4'b0111;
+          3'b011: alu_ctrl = 4'b0111;
           // XOR
-          3'b100:  alu_ctrl = 4'b1000;
+          3'b100: alu_ctrl = 4'b1000;
           // SLL
-          3'b001:  alu_ctrl = 4'b0100;
-          // SRL
-          3'b101:  alu_ctrl = 4'b0110;
+          3'b001: alu_ctrl = 4'b0100;
+          // SRL, SRA
+          3'b101: begin
+            if (func7 == 7'b0000000) begin
+              alu_ctrl = 4'b0110;  // srl
+            end else if (func7 == 7'b0100000) begin
+              alu_ctrl = 4'b1001;  // sra
+            end
+          end
+
           default: alu_ctrl = 4'b0111;
         endcase
       end

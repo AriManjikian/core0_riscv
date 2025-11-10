@@ -56,8 +56,26 @@ async def add_test(dut):
     await Timer(10, unit="ns")
     dut.op.value = 0b0110011
     dut.func3.value = 0b000
+    dut.func7.value = 0b0000000
     await Timer(1, unit="ns")
     assert dut.alu_ctrl.value == "0000"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "1"
+    assert dut.alu_src.value == "0"
+    assert dut.write_back_src.value == "00"
+
+    assert dut.pc_src.value == "0"
+
+
+@cocotb.test()
+async def sub_test(dut):
+    await set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b0110011
+    dut.func3.value = 0b000
+    dut.func7.value = 0b0100000
+    await Timer(1, unit="ns")
+    assert dut.alu_ctrl.value == "0001"
     assert dut.mem_write.value == "0"
     assert dut.reg_write.value == "1"
     assert dut.alu_src.value == "0"
