@@ -331,11 +331,133 @@ async def beq_test(dut):
     assert dut.alu_src.value == "0"
     assert dut.branch.value == "1"
     assert dut.pc_src.value == "0"
+    assert dut.second_add_src.value == "0"
 
     await Timer(3, unit="ns")
     dut.alu_zero.value = 0b1
     await Timer(1, unit="ns")
     assert dut.pc_src.value == "1"
+    assert dut.second_add_src.value == "0"
+
+
+@cocotb.test()
+async def bne_test(dut):
+    await set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b1100011
+    dut.func3.value = 0b001
+    dut.alu_zero.value = 0b1
+    await Timer(1, unit="ns")
+    assert dut.alu_ctrl.value == "0001"
+    assert dut.imm_src.value == "010"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "0"
+    assert dut.alu_src.value == "0"
+    assert dut.branch.value == "1"
+    assert dut.pc_src.value == "0"
+    assert dut.second_add_src.value == "0"
+
+    await Timer(3, unit="ns")
+    dut.alu_zero.value = 0b0
+    await Timer(1, unit="ns")
+    assert dut.pc_src.value == "1"
+    assert dut.second_add_src.value == "0"
+
+
+@cocotb.test()
+async def blt_test(dut):
+    await set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b1100011
+    dut.func3.value = 0b100
+    dut.alu_last_bit.value = 0b0
+    await Timer(1, unit="ns")
+    assert dut.imm_src.value == "010"
+    assert dut.alu_ctrl.value == "0101"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "0"
+    assert dut.alu_src.value == "0"
+    assert dut.branch.value == "1"
+    assert dut.pc_src.value == "0"
+    assert dut.second_add_src.value == "0"
+
+    await Timer(3, unit="ns")
+    dut.alu_last_bit.value = 0b1
+    await Timer(1, unit="ns")
+    assert dut.pc_src.value == "1"
+    assert dut.second_add_src.value == "0"
+
+
+@cocotb.test()
+async def bge_test(dut):
+    await set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b1100011
+    dut.func3.value = 0b101
+    dut.alu_last_bit.value = 0b1
+    await Timer(1, unit="ns")
+    assert dut.imm_src.value == "010"
+    assert dut.alu_ctrl.value == "0101"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "0"
+    assert dut.alu_src.value == "0"
+    assert dut.branch.value == "1"
+    assert dut.pc_src.value == "0"
+    assert dut.second_add_src.value == "0"
+
+    await Timer(3, unit="ns")
+    dut.alu_last_bit.value = 0b0
+    await Timer(1, unit="ns")
+    assert dut.pc_src.value == "1"
+    assert dut.second_add_src.value == "0"
+
+
+@cocotb.test()
+async def bltu_test(dut):
+    await set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b1100011
+    dut.func3.value = 0b110
+    dut.alu_last_bit.value = 0b0
+    await Timer(1, unit="ns")
+    assert dut.imm_src.value == "010"
+    assert dut.alu_ctrl.value == "0111"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "0"
+    assert dut.alu_src.value == "0"
+    assert dut.branch.value == "1"
+    assert dut.pc_src.value == "0"
+    assert dut.second_add_src.value == "0"
+
+    await Timer(3, unit="ns")
+    dut.alu_last_bit.value = 0b1
+    await Timer(1, unit="ns")
+    assert dut.pc_src.value == "1"
+    assert dut.second_add_src.value == "0"
+
+
+@cocotb.test()
+async def bgeu_test(dut):
+    await set_unknown(dut)
+    await Timer(10, unit="ns")
+    dut.op.value = 0b1100011
+    dut.func3.value = 0b111
+    dut.alu_last_bit.value = 0b1
+    await Timer(1, unit="ns")
+    assert dut.imm_src.value == "010"
+    assert dut.alu_ctrl.value == "0111"
+    assert dut.mem_write.value == "0"
+    assert dut.reg_write.value == "0"
+    assert dut.alu_src.value == "0"
+    assert dut.branch.value == "1"
+    assert dut.pc_src.value == "0"
+    assert dut.second_add_src.value == "0"
+
+    await Timer(3, unit="ns")
+    dut.alu_last_bit.value = 0b0
+    await Timer(1, unit="ns")
+    assert dut.pc_src.value == "1"
+    assert dut.second_add_src.value == "0"
 
 
 @cocotb.test()

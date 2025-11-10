@@ -61,6 +61,7 @@ module cpu (
   wire mem_write;
   wire reg_write;
   wire alu_src;
+  wire alu_last_bit;
   wire [1:0] write_back_src;
   wire pc_src;
   wire second_add_src;
@@ -70,6 +71,7 @@ module cpu (
       .func3(func3),
       .func7(func7),
       .alu_zero(alu_zero),
+      .alu_last_bit(alu_last_bit),
 
       .alu_ctrl(alu_ctrl),
       .imm_src(imm_src),
@@ -143,7 +145,8 @@ module cpu (
       .src2(alu_src2),
 
       .alu_res(alu_res),
-      .zero(alu_zero)
+      .zero(alu_zero),
+      .last_bit(alu_last_bit)
   );
 
   wire [31:0] mem_read;

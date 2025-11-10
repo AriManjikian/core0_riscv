@@ -4,7 +4,8 @@ module alu (
     input logic [31:0] src2,
 
     output logic [31:0] alu_res,
-    output logic zero
+    output logic zero,
+    output logic last_bit
 );
   wire [4:0] shamt = src2[4:0];
 
@@ -35,5 +36,5 @@ module alu (
   end
 
   assign zero = alu_res == 32'd0;
-
+  assign last_bit = alu_res[0];
 endmodule

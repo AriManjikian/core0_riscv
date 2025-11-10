@@ -231,3 +231,56 @@ async def cpu_instr_test(dut):
     assert binary_to_hex(dut.instr.value) == "4079D433"
     await RisingEdge(dut.clk)
     assert binary_to_hex(dut.regfile.registers[8].value) == "FFFFFFEE"
+
+    # BLT
+    assert binary_to_hex(dut.pc.value) == "000000D0"
+    assert binary_to_hex(dut.instr.value) == "0088C463"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.pc.value) == "000000D4"
+
+    assert binary_to_hex(dut.instr.value) == "01144463"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.pc.value) == "000000DC"
+
+    # BNE
+    assert binary_to_hex(dut.instr.value) == "00841463"
+    assert binary_to_hex(dut.regfile.registers[8].value) == "FFFFFFEE"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.pc.value) == "000000E0"
+
+    assert binary_to_hex(dut.instr.value) == "01141463"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.pc.value) == "000000E8"
+
+    # BGE
+    assert binary_to_hex(dut.instr.value) == "01145463"
+    assert binary_to_hex(dut.regfile.registers[8].value) == "FFFFFFEE"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.pc.value) == "000000EC"
+
+    assert binary_to_hex(dut.instr.value) == "00845463"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.pc.value) == "000000F4"
+    assert binary_to_hex(dut.regfile.registers[8].value) == "FFFFFFEE"
+
+    # BLTU
+    assert binary_to_hex(dut.instr.value) == "01146463"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.pc.value) == "000000F8"
+
+    assert binary_to_hex(dut.instr.value) == "0088E463"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.pc.value) == "00000100"
+    assert binary_to_hex(dut.regfile.registers[8].value) == "FFFFFFEE"
+
+    # BGEU
+    assert binary_to_hex(dut.instr.value) == "0088F463"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.pc.value) == "00000104"
+
+    assert binary_to_hex(dut.instr.value) == "01147463"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.pc.value) == "0000010C"
+    assert binary_to_hex(dut.regfile.registers[8].value) == "FFFFFFEE"
+
+    # JALR
