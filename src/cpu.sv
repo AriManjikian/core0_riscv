@@ -54,7 +54,7 @@ module cpu (
   assign func3 = instr[14:12];
   wire alu_zero;
 
-  wire [2:0] alu_ctrl;
+  wire [3:0] alu_ctrl;
   wire [2:0] imm_src;
   wire mem_write;
   wire reg_write;
