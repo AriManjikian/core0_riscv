@@ -3,7 +3,6 @@ from cocotb.clock import Clock
 from cocotb.triggers import Timer, RisingEdge
 from mem_gen import generate_random_mem_file
 
-MEM_WORDS = 64
 MEM_FILE = "mem.hex"
 
 
@@ -18,8 +17,8 @@ async def reset(dut):
     dut.rst_n.value = 1
     cocotb.log.info("[MEM] [RST] Completed")
 
-    for addr in range(MEM_WORDS):
-        dut.address.value = addr * 4
+    for addr in range(dut.WORDS.value):
+        dut.address.value = addr
         await Timer(1, unit="ns")
         assert int(dut.read_data.value) == 0
 
@@ -30,7 +29,7 @@ async def test_basic_writes(dut):
     await reset(dut)
 
     test_data = [(0, 0xDEADBEEF), (4, 0xCAFEBABE), (8, 0x12345678), (12, 0xA5A5A5A5)]
-    # dut.byte_en.value = 0b1111
+    dut.byte_en.value = 0b1111
 
     for addr, data in test_data:
         dut.address.value = addr
@@ -44,6 +43,27 @@ async def test_basic_writes(dut):
             dut.read_data.value == data
         ), f"[MEM] Error at address {addr}: expected {hex(data)}, got {hex(dut.read_data.value)}"
 
+    dut.w_en.value = 1
+
+    for byte_en in range(16):
+        await reset(dut)
+        dut.byte_en.value = byte_en
+        mask = 0
+        for j in range(4):
+            if (byte_en >> j) & 1:
+                mask |= 0xFF << (j * 8)
+        for address, data in test_data:
+            dut.address.value = address
+            dut.write_data.value = data
+
+            dut.w_en.value = 1
+            await RisingEdge(dut.clk)
+            dut.w_en.value = 0
+            await RisingEdge(dut.clk)
+            dut.address.value = address
+            await RisingEdge(dut.clk)
+            assert dut.read_data.value == data & mask
+
     cocotb.log.info("[MEM] Basic write/read test passed!")
 
 
@@ -52,7 +72,7 @@ async def test_sequential_writes(dut):
     cocotb.start_soon(Clock(dut.clk, 1, unit="ns").start())
     await reset(dut)
 
-    # dut.byte_en.value = 0b1111
+    dut.byte_en.value = 0b1111
 
     for i in range(0, 40, 4):
         dut.address.value = i
@@ -77,8 +97,8 @@ async def test_random_memory(dut):
     cocotb.start_soon(Clock(dut.clk, 1, unit="ns").start())
     await reset(dut)
 
-    ref_mem = generate_random_mem_file(MEM_FILE, MEM_WORDS)
-    # dut.byte_en.value = 0b1111
+    ref_mem = generate_random_mem_file(MEM_FILE, dut.WORDS.value)
+    dut.byte_en.value = 0b1111
 
     for addr, data in enumerate(ref_mem):
         dut.address.value = addr * 4

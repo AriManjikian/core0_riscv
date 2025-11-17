@@ -7,6 +7,7 @@ module memory #(
     input logic rst_n,
     input logic [31:0] address,
     input logic [31:0] write_data,
+    input logic [3:0] byte_en,
     input logic w_en,
 
     output logic [31:0] read_data
@@ -30,7 +31,11 @@ module memory #(
         if (address[1:0] != 2'b00) begin
           $display("Misaligned write at address %h", address);
         end else begin
-          mem[address[31:2]%WORDS] <= write_data;
+          for (int i = 0; i < 4; i++) begin
+            if (byte_en[i]) begin
+              mem[address[31:2]%WORDS][(i*8)+:8] <= write_data[(i*8)+:8];
+            end
+          end
         end
       end
     end

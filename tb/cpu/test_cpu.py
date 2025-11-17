@@ -295,3 +295,47 @@ async def cpu_instr_test(dut):
     assert binary_to_hex(dut.regfile.registers[7].value) == "00000120"
     await RisingEdge(dut.clk)
     assert binary_to_hex(dut.regfile.registers[1].value) == "00000118"
+
+    # SB
+    assert binary_to_hex(dut.instr.value) == "008020A3"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.data_memory.mem[1].value) == "00000000"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.data_memory.mem[1].value) == "00EE0000"
+
+    # SH
+    assert binary_to_hex(dut.instr.value) == "008010A3"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.data_memory.mem[1].value) == "00EE0000"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.data_memory.mem[1].value) == "00EE0000"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.data_memory.mem[1].value) == "FFEE0000"
+
+    # LB
+    assert binary_to_hex(dut.instr.value) == "01000393"
+
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[7].value) == "00000010"
+
+    assert binary_to_hex(dut.regfile.registers[18].value) == "FFF8FF00"
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[18].value) == "FFF8FF00"
+
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[18].value) == "FFFFFFDE"
+    # LBU
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[19].value) == "000000BE"
+    # LH
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[20].value) == "0FFFFEEF"
+
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[20].value) == "FFFFDEAD"
+    # LHU
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[21].value) == "FFFFFFEE"
+
+    await RisingEdge(dut.clk)
+    assert binary_to_hex(dut.regfile.registers[21].value) == "0000DEAD"

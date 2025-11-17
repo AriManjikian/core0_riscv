@@ -44,6 +44,7 @@ module cpu (
       .clk(clk),
       .address(pc),
       .write_data(32'b0),
+      .byte_en(4'b0000),
       .w_en(1'b0),
       .rst_n(1'b1),
 
@@ -91,20 +92,34 @@ module cpu (
   assign source_reg2 = instr[24:20];
   logic [4:0] dest_reg;
   assign dest_reg = instr[11:7];
-  wire  [31:0] data_reg1;
-  wire  [31:0] data_reg2;
+  wire [31:0] data_reg1;
+  wire [31:0] data_reg2;
 
+  logic wb_valid;
   logic [31:0] write_back_data;
+
   always_comb begin : wbSelect
     unique case (write_back_src)
       // R-Type
-      2'b00: write_back_data = alu_res;
+      2'b00: begin
+        write_back_data = alu_res;
+        wb_valid = 1'b1;
+      end
       // I-Type
-      2'b01: write_back_data = mem_read;
+      2'b01: begin
+        write_back_data = mem_read_write_back_data;
+        wb_valid = mem_read_write_back_valid;
+      end
       // J-Type
-      2'b10: write_back_data = pc_plus_4;
+      2'b10: begin
+        write_back_data = pc_plus_4;
+        wb_valid = 1'b1;
+      end
       // U-Type
-      2'b11: write_back_data = pc_plus_second_add;
+      2'b11: begin
+        write_back_data = pc_plus_second_add;
+        wb_valid = 1'b1;
+      end
     endcase
   end
 
@@ -118,7 +133,7 @@ module cpu (
       .read_data1(data_reg1),
       .read_data2(data_reg2),
 
-      .w_en(reg_write),
+      .w_en(reg_write & wb_valid),
       .write_data(write_back_data),
       .address3(dest_reg)
   );
@@ -151,17 +166,41 @@ module cpu (
       .last_bit(alu_last_bit)
   );
 
+  wire [ 3:0] byte_en;
+  wire [31:0] mem_write_data;
+
+  byte_enable_decoder byte_en_decoder (
+      .alu_res_address(alu_res),
+      .reg_read(data_reg2),
+      .func3(func3),
+      .byte_en(byte_en),
+      .data(mem_write_data)
+  );
+
   wire [31:0] mem_read;
   memory #(
       .mem_init("./test_dmemory.hex")
   ) data_memory (
       .clk(clk),
-      .address(alu_res),
-      .write_data(data_reg2),
+      .address({alu_res[31:2], 2'b00}),
+      .write_data(mem_write_data),
       .w_en(mem_write),
+      .byte_en(byte_en),
       .rst_n(1'b1),
 
       .read_data(mem_read)
   );
+
+  wire [31:0] mem_read_write_back_data;
+  wire mem_read_write_back_valid;
+
+  reader reader_inst (
+      .mem_data(mem_read),
+      .be_mask(byte_en),
+      .func3(func3),
+      .wb_data(mem_read_write_back_data),
+      .valid(mem_read_write_back_valid)
+  );
+
 
 endmodule

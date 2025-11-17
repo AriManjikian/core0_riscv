@@ -125,7 +125,7 @@ module controller (
       2'b00:   alu_ctrl = 4'b0000;
       // R-Types
       2'b10: begin
-        case (func3)
+        unique case (func3)
           // ADD, SUB
           3'b000: begin
             if (op == 7'b0110011) begin
@@ -154,8 +154,6 @@ module controller (
               alu_ctrl = 4'b1001;  // sra
             end
           end
-
-          default: alu_ctrl = 4'b0111;
         endcase
       end
       // B-Type
@@ -170,7 +168,7 @@ module controller (
           default: alu_ctrl = 4'b1111;
         endcase
       end
-      default: alu_ctrl = 4'b0111;
+      default: alu_ctrl = 4'b1111;
     endcase
   end
 

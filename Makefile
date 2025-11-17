@@ -3,13 +3,19 @@
 all: clean test
 
 test:
-	. .venv/bin/activate && $(MAKE) alu controller memory regfile sign_ext load_store_decoder reader cpu
+	. .venv/bin/activate && $(MAKE) alu controller memory regfile sign_ext byte_enable_decoder reader cpu
 
 alu:
 	$(MAKE) -C tb/alu
 
+byte_enable_decoder:
+	$(MAKE) -C tb/byte_enable_decoder
+
 memory:
 	$(MAKE) -C tb/memory
+
+reader:
+	$(MAKE) -C tb/reader
 
 regfile:
 	$(MAKE) -C tb/regfile
