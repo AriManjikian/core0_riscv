@@ -44,4 +44,10 @@ module memory #(
   always_comb begin
     read_data = mem[address[31:2]%WORDS];
   end
+
+  // final begin
+  //   $display("Dumping memory from inside module...");
+  //   $writememh("final_dmemory.hex", mem);
+  // end
+
 endmodule

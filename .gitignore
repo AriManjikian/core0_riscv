@@ -5,3 +5,4 @@ results.xml
 __pycache__
 sim_build
 mem.hex
+./tb/memory/final_dmemory.hex

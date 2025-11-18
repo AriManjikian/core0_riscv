@@ -8,6 +8,8 @@ module byte_enable_decoder (
     output logic [ 3:0] byte_en,
     output logic [31:0] data
 );
+  import core0_pkg::*;
+
   logic [1:0] offset;
 
 
@@ -15,7 +17,7 @@ module byte_enable_decoder (
 
   always_comb begin
     case (func3)
-      3'b000, 3'b100: begin
+      F3_BYTE, F3_BYTE_U: begin
         case (offset)
           2'b00: begin
             byte_en = 4'b0001;
@@ -38,11 +40,11 @@ module byte_enable_decoder (
           end
         endcase
       end
-      3'b010: begin
+      F3_WORD: begin
         byte_en = (offset == 2'b00) ? 4'b1111 : 4'b0000;
         data = reg_read;
       end
-      3'b001, 3'b101: begin
+      F3_HALFWORD, F3_HALFWORD_U: begin
         case (offset)
           2'b00: begin
             byte_en = 4'b0011;
