@@ -1,6 +1,6 @@
 .PHONY: all test clean alu controller cpu memory regfile sign_ext load_store_decoder reader
 
-all: clean test
+all: clean test view
 
 test:
 	. .venv/bin/activate && $(MAKE) alu controller memory regfile sign_ext byte_enable_decoder reader cpu
@@ -30,11 +30,6 @@ cpu:
 	$(MAKE) -C tb/cpu
 
 view: 
-	gtkwave tb/alu/dump.vcd &
-	gtkwave tb/memory/dump.vcd &
-	gtkwave tb/regfile/dump.vcd &
-	gtkwave tb/sign_ext/dump.vcd &
-	gtkwave tb/controller/dump.vcd &
 	gtkwave tb/cpu/dump.vcd &
 
 clean:
